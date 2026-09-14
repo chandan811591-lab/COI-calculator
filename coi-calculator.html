@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cost of Inaction Calculator</title>
+<style>
+  :root{
+    --ink:#14171f;
+    --ink-soft:#4b5160;
+    --paper:#faf9f6;
+    --card:#ffffff;
+    --line:#e4e1da;
+    --accent:#0f5f56;
+    --accent-soft:#e6f2ef;
+    --gold:#a9793f;
+    --serif: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    --mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:2.6rem 1.4rem 4rem;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    color:var(--accent);
+    margin:0 0 0.4rem;
+  }
+  h1{
+    font-size:1.9rem;
+    line-height:1.18;
+    margin:0 0 0.6rem;
+    font-weight:600;
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:1rem;
+    line-height:1.55;
+    margin:0 0 2.2rem;
+    max-width:46ch;
+  }
+  .field-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:1rem;
+    padding:1.15rem 0;
+    border-bottom:1px solid var(--line);
+  }
+  .field-row label{
+    font-size:1rem;
+    color:var(--ink);
+  }
+  .field-row .hint{
+    display:block;
+    font-family:var(--mono);
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    margin-top:0.2rem;
+  }
+  .input-shell{
+    display:flex;
+    align-items:baseline;
+    font-family:var(--mono);
+    font-size:1.15rem;
+    flex-shrink:0;
+  }
+  .input-shell span{ color:var(--ink-soft); margin-right:0.15rem; }
+  input[type="text"]{
+    font-family:var(--mono);
+    font-size:1.15rem;
+    text-align:right;
+    width:9rem;
+    border:none;
+    border-bottom:1.5px solid var(--line);
+    background:transparent;
+    color:var(--ink);
+    padding:0.15rem 0.1rem;
+    outline:none;
+  }
+  input[type="text"]:focus{
+    border-bottom-color:var(--accent);
+  }
+  .total-card{
+    margin-top:1.8rem;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:2px;
+    padding:1.6rem 1.5rem;
+  }
+  .total-card .label{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    letter-spacing:0.04em;
+    color:#a9b0bb;
+    margin-bottom:0.4rem;
+  }
+  .total-card .amount{
+    font-family:var(--mono);
+    font-size:2.4rem;
+    font-weight:600;
+    line-height:1;
+  }
+  .anchor-card{
+    margin-top:1rem;
+    background:var(--accent-soft);
+    border:1px solid #cfe6e1;
+    border-radius:2px;
+    padding:1.5rem 1.5rem 1.6rem;
+  }
+  .anchor-card .label{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    letter-spacing:0.04em;
+    color:var(--accent);
+    margin-bottom:0.6rem;
+  }
+  .range-row{
+    display:flex;
+    align-items:baseline;
+    gap:0.6rem;
+    flex-wrap:wrap;
+  }
+  .range-row .amount{
+    font-family:var(--mono);
+    font-size:1.7rem;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .range-row .dash{ color:var(--ink-soft); font-family:var(--mono); }
+  .slider-row{
+    margin-top:1rem;
+  }
+  .slider-row .pct-label{
+    font-family:var(--mono);
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:0.35rem;
+  }
+  input[type="range"]{
+    width:100%;
+    accent-color:var(--accent);
+  }
+  .pitch{
+    margin-top:1.8rem;
+  }
+  .pitch .label{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    letter-spacing:0.04em;
+    color:var(--ink-soft);
+    margin-bottom:0.5rem;
+  }
+  .pitch blockquote{
+    margin:0;
+    padding:1.1rem 1.3rem;
+    background:var(--card);
+    border-left:3px solid var(--gold);
+    font-size:0.98rem;
+    line-height:1.6;
+    color:var(--ink);
+    font-style:italic;
+  }
+  .pitch blockquote b{ font-style:normal; }
+  .copy-btn{
+    margin-top:0.7rem;
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--accent);
+    background:none;
+    border:1px solid var(--accent);
+    border-radius:2px;
+    padding:0.45rem 0.9rem;
+    cursor:pointer;
+  }
+  .copy-btn:active{ background:var(--accent-soft); }
+  .foot{
+    margin-top:2.4rem;
+    font-family:var(--mono);
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    line-height:1.6;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">VALUE-BASED PRICING PROMPT ENGINE</p>
+  <h1>Cost of Inaction Calculator</h1>
+  <p class="lede">Enter what the AI prompt (or your own estimate) returned for each category. Everything below updates as you type.</p>
+
+  <div class="field-row">
+    <div>
+      <label for="lostRevenue">Lost Revenue</label>
+      <span class="hint">missed or delayed revenue, 12 mo</span>
+    </div>
+    <div class="input-shell"><span>$</span><input type="text" inputmode="numeric" id="lostRevenue" placeholder="0"></div>
+  </div>
+
+  <div class="field-row">
+    <div>
+      <label for="wastedLabor">Wasted Labor</label>
+      <span class="hint">internal hours burned, 12 mo</span>
+    </div>
+    <div class="input-shell"><span>$</span><input type="text" inputmode="numeric" id="wastedLabor" placeholder="0"></div>
+  </div>
+
+  <div class="field-row" style="border-bottom:none;">
+    <div>
+      <label for="riskExposure">Risk Exposure</label>
+      <span class="hint">probability-weighted downside</span>
+    </div>
+    <div class="input-shell"><span>$</span><input type="text" inputmode="numeric" id="riskExposure" placeholder="0"></div>
+  </div>
+
+  <div class="total-card">
+    <div class="label">TOTAL 12-MONTH COST OF INACTION</div>
+    <div class="amount" id="totalAmount">$0</div>
+  </div>
+
+  <div class="anchor-card">
+    <div class="label">YOUR PRICE ANCHOR</div>
+    <div class="range-row">
+      <span class="amount" id="lowAnchor">$0</span>
+      <span class="dash">—</span>
+      <span class="amount" id="highAnchor">$0</span>
+    </div>
+    <div class="slider-row">
+      <div class="pct-label"><span>10% (conservative)</span><span id="pctReadout">15%</span><span>20% (strong proof)</span></div>
+      <input type="range" id="pctSlider" min="10" max="20" value="15" step="1">
+    </div>
+  </div>
+
+  <div class="pitch">
+    <div class="label">YOUR ANCHOR SENTENCE</div>
+    <blockquote id="pitchText">
+      "Based on what we discussed, this problem is costing you roughly <b>$0</b> over the next year.
+      My fee to solve it is <b>$0</b> — about 15% of that number."
+    </blockquote>
+    <button class="copy-btn" id="copyBtn">Copy sentence</button>
+  </div>
+
+  <p class="foot">Part of The Value-Based Pricing Prompt Engine. Works offline, no data leaves this page.</p>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const fields = ['lostRevenue','wastedLabor','riskExposure'].map(id => $(id));
+  const totalEl = $('totalAmount');
+  const lowEl = $('lowAnchor');
+  const highEl = $('highAnchor');
+  const pctSlider = $('pctSlider');
+  const pctReadout = $('pctReadout');
+  const pitchText = $('pitchText');
+  const copyBtn = $('copyBtn');
+
+  function parseNum(v){
+    const n = parseFloat((v||'').replace(/[^0-9.]/g, ''));
+    return isNaN(n) ? 0 : n;
+  }
+  function fmt(n){
+    return '$' + Math.round(n).toLocaleString('en-US');
+  }
+
+  function recalc(){
+    const total = fields.reduce((sum, f) => sum + parseNum(f.value), 0);
+    totalEl.textContent = fmt(total);
+
+    const low = total * 0.10;
+    const high = total * 0.20;
+    lowEl.textContent = fmt(low);
+    highEl.textContent = fmt(high);
+
+    const pct = parseInt(pctSlider.value, 10);
+    pctReadout.textContent = pct + '%';
+    const price = total * (pct/100);
+
+    pitchText.innerHTML = `"Based on what we discussed, this problem is costing you roughly <b>${fmt(total)}</b> ` +
+      `over the next year. My fee to solve it is <b>${fmt(price)}</b> — about ${pct}% of that number."`;
+  }
+
+  fields.forEach(f => f.addEventListener('input', recalc));
+  pctSlider.addEventListener('input', recalc);
+
+  copyBtn.addEventListener('click', () => {
+    const plain = pitchText.textContent.trim().replace(/\s+/g, ' ');
+    navigator.clipboard.writeText(plain).then(() => {
+      copyBtn.textContent = 'Copied';
+      setTimeout(() => copyBtn.textContent = 'Copy sentence', 1400);
+    }).catch(() => {});
+  });
+
+  recalc();
+</script>
+</body>
+</html>
